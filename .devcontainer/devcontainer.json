@@ -1,0 +1,42 @@
+{
+  "name": "ParkinsonTap-GP",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-spring-boot",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-azuretools.vscode-docker",
+        "streetsidesoftware.code-spell-checker",
+        "eamodio.gitlens"
+      ],
+      "settings": {
+        "java.configuration.runtimes": [
+          {
+            "name": "JavaSE-17",
+            "path": "/usr/lib/jvm/java-17-amazon-corretto.x86_64",
+            "default": true
+          }
+        ],
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "[java]": {
+          "editor.defaultFormatter": "redhat.java"
+        }
+      }
+    }
+  },
+  "forwardPorts": [8080, 5173, 5433, 1883, 9001],
+  "portsAttributes": {
+    "8080": { "label": "Backend Spring Boot" },
+    "5173": { "label": "Frontend React" },
+    "5433": { "label": "PostgreSQL" },
+    "1883": { "label": "MQTT TCP" },
+    "9001": { "label": "MQTT WebSocket" }
+  },
+  "postCreateCommand": "bash -c '. ~/.nvm/nvm.sh && cd frontend && npm install && echo \"Entorno listo\"'"
+}
