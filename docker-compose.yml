@@ -1,0 +1,60 @@
+services:
+
+  # ── Contenedor de desarrollo ──────────────────────────────────────────────
+  # VS Code se conecta aquí. Tiene Java 17, Node 18 y Maven preinstalados.
+  # No necesitas instalar nada en tu máquina local.
+  devcontainer:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - .:/workspace:cached
+      - maven-cache:/root/.m2
+      - npm-cache:/root/.npm
+    command: sleep infinity
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/parkinsontap
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+      - MQTT_HOST=mqtt
+      - MQTT_PORT=1883
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ── Base de datos ─────────────────────────────────────────────────────────
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: ${DB_NAME:-parkinsontap}
+    ports:
+      - "5433:5432"
+    volumes:
+      - parkinsontap-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-user} -d ${DB_NAME:-parkinsontap}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── MQTT Broker ───────────────────────────────────────────────────────────
+  mqtt:
+    image: eclipse-mosquitto:2
+    restart: always
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-log:/mosquitto/log
+
+volumes:
+  parkinsontap-data:
+  mosquitto-data:
+  mosquitto-log:
+  maven-cache:
+  npm-cache:
