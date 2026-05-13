@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Drawer,
   TextField,
@@ -11,18 +11,19 @@ import {
   MenuItem,
   Switch,
 } from "@mui/material";
-import { Close as CloseIcon, PersonAdd as PersonAddIcon } from "@mui/icons-material";
+import { Close as CloseIcon, EditOutlined as EditIcon } from "@mui/icons-material";
+import { evaluatedService } from "../services/evaluatedService";
 
-const EvaluatedForm = ({ open, onClose, onSuccess }) => {
+const EvaluatedEditForm = ({ open, onClose, evaluated, onSuccess }) => {
   const [formData, setFormData] = useState({
     name: "",
-    birth_date: "",
+    birthDate: "",
+    gender: "",
+    evaluatedType: "",
     height: "",
     weight: "",
-    notes: "",
-    evaluatedType: "",
-    gender: "",
     status: false,
+    notes: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -32,67 +33,70 @@ const EvaluatedForm = ({ open, onClose, onSuccess }) => {
     { id: 2, name: "CONTROLES" },
   ];
 
+  useEffect(() => {
+    if (evaluated) {
+      const typeId =
+        evaluated.evaluatedTypeName?.toUpperCase() === "PACIENTES" ? 1 : 2;
+      setFormData({
+        name: evaluated.name || "",
+        birthDate: evaluated.birthDate
+          ? (typeof evaluated.birthDate === "string"
+              ? evaluated.birthDate.split("T")[0]
+              : evaluated.birthDate)
+          : "",
+        gender: evaluated.genreName?.toUpperCase() || "",
+        evaluatedType: typeId,
+        height: evaluated.height?.toString() || "",
+        weight: evaluated.weight?.toString() || "",
+        status: evaluated.status ?? false,
+        notes: evaluated.notes || "",
+      });
+      setError("");
+    }
+  }, [evaluated]);
+
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
-    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
+    setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
     setError("");
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
+    if (!formData.name.trim()) {
+      setError("El nombre es obligatorio.");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
-      const transformedData = {
+      const selectedType = evaluatedTypes.find((t) => t.id === formData.evaluatedType);
+      const payload = {
         name: formData.name,
-        birthDate: formData.birth_date,
-        genreName: formData.gender,
-        height: parseFloat(formData.height),
-        weight: parseFloat(formData.weight),
+        birthDate: formData.birthDate || null,
+        genreName: formData.gender || null,
+        height: formData.height ? parseFloat(formData.height) : null,
+        weight: formData.weight ? parseFloat(formData.weight) : null,
         notes: formData.notes,
-        evaluatedTypeName: evaluatedTypes.find(
-          (t) => t.id === formData.evaluatedType,
-        )?.name,
-        status: formData.status,
+        evaluatedTypeName: selectedType?.name || null,
+        status: selectedType?.name === "PACIENTES" ? formData.status : false,
       };
-      await onSuccess(transformedData);
-      setFormData({
-        name: "",
-        birth_date: "",
-        height: "",
-        weight: "",
-        notes: "",
-        evaluatedType: "",
-        gender: "",
-        status: false,
-      });
+      const updated = await evaluatedService.updateEvaluated(evaluated.id, payload);
+      onSuccess(updated);
       onClose();
-    } catch (error) {
-      setError(error.message || "Error al enviar el formulario");
+    } catch (err) {
+      setError(err.message || "Error al actualizar el evaluado");
     } finally {
       setLoading(false);
     }
   };
 
   const handleClose = () => {
-    if (!loading) {
-      setFormData({
-        name: "",
-        birth_date: "",
-        height: "",
-        weight: "",
-        notes: "",
-        evaluatedType: "",
-        gender: "",
-        status: false,
-      });
-      setError("");
-      onClose();
-    }
+    if (!loading) onClose();
   };
 
   const selectedType = evaluatedTypes.find((t) => t.id === formData.evaluatedType);
-  const isPatient = selectedType?.name?.toLowerCase() === "pacientes";
+  const isPatient = selectedType?.name === "PACIENTES";
 
   return (
     <Drawer
@@ -132,45 +136,33 @@ const EvaluatedForm = ({ open, onClose, onSuccess }) => {
               justifyContent: "center",
             }}
           >
-            <PersonAddIcon sx={{ fontSize: 18, color: "#059669" }} />
+            <EditIcon sx={{ fontSize: 18, color: "#059669" }} />
           </Box>
           <Box>
             <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 16, fontWeight: 600, color: "#111827" }}>
-              Nuevo evaluado
+              Editar evaluado
             </Typography>
-            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 12, color: "#6B7280", fontWeight: 300 }}>
-              Completa los datos del paciente o control
-            </Typography>
+            {evaluated && (
+              <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 12, color: "#6B7280", fontWeight: 300 }}>
+                {evaluated.name}
+              </Typography>
+            )}
           </Box>
         </Box>
-        <IconButton
-          onClick={handleClose}
-          disabled={loading}
-          size="small"
-          sx={{ color: "#9CA3AF" }}
-        >
+        <IconButton onClick={handleClose} disabled={loading} size="small" sx={{ color: "#9CA3AF" }}>
           <CloseIcon fontSize="small" />
         </IconButton>
       </Box>
 
-      {/* Scrollable content */}
+      {/* Content */}
       <Box
         component="form"
         onSubmit={handleSubmit}
         sx={{ flex: 1, overflowY: "auto", p: 3, display: "flex", flexDirection: "column", gap: 2.5 }}
       >
         {error && (
-          <Box
-            sx={{
-              p: 2,
-              bgcolor: "#FEF2F2",
-              border: "1px solid #FECACA",
-              borderRadius: 1.5,
-            }}
-          >
-            <Typography
-              sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#B91C1C" }}
-            >
+          <Box sx={{ p: 2, bgcolor: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 1.5 }}>
+            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#B91C1C" }}>
               {error}
             </Typography>
           </Box>
@@ -180,7 +172,6 @@ const EvaluatedForm = ({ open, onClose, onSuccess }) => {
         <Box>
           <Typography sx={labelStyle}>Nombre completo</Typography>
           <TextField
-            required
             fullWidth
             name="name"
             value={formData.name}
@@ -196,11 +187,10 @@ const EvaluatedForm = ({ open, onClose, onSuccess }) => {
           <Box>
             <Typography sx={labelStyle}>Fecha de nacimiento</Typography>
             <TextField
-              required
               fullWidth
-              name="birth_date"
+              name="birthDate"
               type="date"
-              value={formData.birth_date}
+              value={formData.birthDate}
               onChange={handleChange}
               disabled={loading}
               InputLabelProps={{ shrink: true }}
@@ -210,7 +200,6 @@ const EvaluatedForm = ({ open, onClose, onSuccess }) => {
           <Box>
             <Typography sx={labelStyle}>Género</Typography>
             <Select
-              required
               name="gender"
               value={formData.gender}
               onChange={handleChange}
@@ -233,7 +222,6 @@ const EvaluatedForm = ({ open, onClose, onSuccess }) => {
         <Box>
           <Typography sx={labelStyle}>Tipo de evaluado</Typography>
           <Select
-            required
             name="evaluatedType"
             value={formData.evaluatedType}
             onChange={handleChange}
@@ -258,7 +246,6 @@ const EvaluatedForm = ({ open, onClose, onSuccess }) => {
           <Box>
             <Typography sx={labelStyle}>Altura (cm)</Typography>
             <TextField
-              required
               fullWidth
               name="height"
               type="number"
@@ -273,7 +260,6 @@ const EvaluatedForm = ({ open, onClose, onSuccess }) => {
           <Box>
             <Typography sx={labelStyle}>Peso (kg)</Typography>
             <TextField
-              required
               fullWidth
               name="weight"
               type="number"
@@ -301,14 +287,10 @@ const EvaluatedForm = ({ open, onClose, onSuccess }) => {
             }}
           >
             <Box>
-              <Typography
-                sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, fontWeight: 500, color: "#374151" }}
-              >
+              <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, fontWeight: 500, color: "#374151" }}>
                 Tomando medicamentos
               </Typography>
-              <Typography
-                sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 12, color: "#9CA3AF", fontWeight: 300 }}
-              >
+              <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 12, color: "#9CA3AF", fontWeight: 300 }}>
                 ¿El paciente está en tratamiento actualmente?
               </Typography>
             </Box>
@@ -319,9 +301,7 @@ const EvaluatedForm = ({ open, onClose, onSuccess }) => {
               disabled={loading}
               sx={{
                 "& .MuiSwitch-switchBase.Mui-checked": { color: "#1B4F8A" },
-                "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                  bgcolor: "#1B4F8A",
-                },
+                "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { bgcolor: "#1B4F8A" },
               }}
             />
           </Box>
@@ -353,7 +333,7 @@ const EvaluatedForm = ({ open, onClose, onSuccess }) => {
         </Box>
       </Box>
 
-      {/* Sticky footer */}
+      {/* Footer */}
       <Box
         sx={{
           display: "flex",
@@ -370,11 +350,7 @@ const EvaluatedForm = ({ open, onClose, onSuccess }) => {
           Cancelar
         </Button>
         <Button onClick={handleSubmit} disabled={loading} sx={submitBtnStyle}>
-          {loading ? (
-            <CircularProgress size={16} sx={{ color: "#9CA3AF" }} />
-          ) : (
-            "Agregar evaluado"
-          )}
+          {loading ? <CircularProgress size={16} sx={{ color: "#9CA3AF" }} /> : "Guardar cambios"}
         </Button>
       </Box>
     </Drawer>
@@ -414,15 +390,9 @@ const selectStyle = {
   fontSize: 13,
   bgcolor: "#fff",
   height: 44,
-  "& .MuiOutlinedInput-notchedOutline": {
-    borderColor: "#E2E8F0",
-    borderWidth: 1,
-  },
+  "& .MuiOutlinedInput-notchedOutline": { borderColor: "#E2E8F0", borderWidth: 1 },
   "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#9CA3AF" },
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderColor: "#1B4F8A",
-    borderWidth: 1.5,
-  },
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#1B4F8A", borderWidth: 1.5 },
 };
 
 const cancelBtnStyle = {
@@ -441,15 +411,15 @@ const cancelBtnStyle = {
 const submitBtnStyle = {
   height: 40,
   px: 2.5,
-  bgcolor: "#1B4F8A",
+  bgcolor: "#059669",
   color: "#fff",
   borderRadius: 1.5,
   fontFamily: '"DM Sans", sans-serif',
   fontWeight: 500,
   fontSize: 13,
   textTransform: "none",
-  "&:hover": { bgcolor: "#153D6B" },
+  "&:hover": { bgcolor: "#047857" },
   "&:disabled": { bgcolor: "#F3F4F6", color: "#9CA3AF" },
 };
 
-export default EvaluatedForm;
+export default EvaluatedEditForm;

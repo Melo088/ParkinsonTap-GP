@@ -74,6 +74,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/doctor/delete/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/evaluated/**").hasAnyAuthority("ADMIN", "DOCTOR")
                         .requestMatchers("/api/test/**").hasAnyAuthority("ADMIN", "DOCTOR")
+                        .requestMatchers("/api/analysis/**").hasAnyAuthority("ADMIN", "DOCTOR")
                         .requestMatchers("/api/esp32/**").permitAll()
                         .requestMatchers("/api/reading/**").permitAll()
                         .anyRequest().authenticated())

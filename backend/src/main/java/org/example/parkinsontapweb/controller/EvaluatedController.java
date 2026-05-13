@@ -124,6 +124,39 @@ public class EvaluatedController {
         return evaluatedRepository.findByNameContainingIgnoreCase(name);
     }
 
+    @PutMapping("/update/{id}")
+    @PreAuthorize("hasAuthority('DOCTOR')")
+    public ResponseEntity<?> updateEvaluated(@PathVariable Integer id, @RequestBody EvaluatedDTO dto) {
+        Optional<Evaluated> optionalEvaluated = evaluatedRepository.findById(id);
+        if (optionalEvaluated.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Evaluated not found"));
+        }
+        Evaluated evaluated = optionalEvaluated.get();
+        if (dto.getName() != null && !dto.getName().isBlank())
+            evaluated.setName(dto.getName());
+        if (dto.getHeight() != null)
+            evaluated.setHeight(dto.getHeight());
+        if (dto.getWeight() != null)
+            evaluated.setWeight(dto.getWeight());
+        if (dto.getBirthDate() != null)
+            evaluated.setBirthDate(dto.getBirthDate());
+        if (dto.getNotes() != null)
+            evaluated.setNotes(dto.getNotes());
+        if (dto.getStatus() != null)
+            evaluated.setStatus(dto.getStatus());
+        if (dto.getGenreName() != null) {
+            Genre genre = genreRepository.findByGenreName(dto.getGenreName().toUpperCase());
+            if (genre != null) evaluated.setGenre(genre);
+        }
+        if (dto.getEvaluatedTypeName() != null) {
+            EvaluatedType type = evaluatedTypeRepository.findByTypeNameContainingIgnoreCase(dto.getEvaluatedTypeName());
+            if (type != null) evaluated.setEvaluatedType(type);
+        }
+        evaluatedRepository.save(evaluated);
+        return ResponseEntity.ok(EvaluatedMapper.toDTO(evaluated));
+    }
+
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('DOCTOR')")
     public ResponseEntity<Map<String, String>> deleteEvaluated(@PathVariable Integer id) {

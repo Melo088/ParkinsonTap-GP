@@ -1,37 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import {
   Delete as DeleteIcon,
   ShowChart as ShowChartIcon,
   Analytics as AnalyticsIcon,
   DeleteSweep as DeleteSweepIcon,
+  Assessment as AssessmentIcon,
   LocalHospital,
   HealthAndSafety,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import ConfirmDialog from "./ConfirmDialog";
 
 const TestCard = ({ test, onDelete, onDataDelete, currentDoctorEmail }) => {
   const navigate = useNavigate();
-
-  const handleDelete = () => {
-    if (
-      window.confirm(
-        `¿Estás seguro de que deseas eliminar el test "${test.name}"?`,
-      )
-    ) {
-      onDelete(test.testId);
-    }
-  };
-
-  const handleDeleteData = () => {
-    if (
-      window.confirm(
-        `¿Estás seguro de que deseas eliminar los datos del test "${test.name}"? Esta acción no se puede deshacer.`,
-      )
-    ) {
-      onDataDelete(test.testId);
-    }
-  };
+  const [deleteTestOpen, setDeleteTestOpen] = useState(false);
+  const [deleteDataOpen, setDeleteDataOpen] = useState(false);
 
   const formatDate = (dateString) => {
     try {
@@ -48,17 +32,15 @@ const TestCard = ({ test, onDelete, onDataDelete, currentDoctorEmail }) => {
     }
   };
 
-  const canDelete =
-    !test.doctorEmail || currentDoctorEmail === test.doctorEmail;
-  const isPatient =
-    test.evaluated?.evaluatedTypeName?.toLowerCase() === "pacientes";
-  const typeColor = isPatient ? "#EF4444" : "#10B981";
+  const canDelete = !test.doctorEmail || currentDoctorEmail === test.doctorEmail;
+  const isPatient = test.evaluated?.evaluatedTypeName?.toLowerCase() === "pacientes";
+  const typeColor = isPatient ? "#DC2626" : "#059669";
 
   return (
     <Box
       sx={{
         bgcolor: "#fff",
-        border: "1px solid #E5E7EB",
+        border: "1px solid #E2E8F0",
         borderRadius: 2.5,
         overflow: "hidden",
         height: "100%",
@@ -66,7 +48,7 @@ const TestCard = ({ test, onDelete, onDataDelete, currentDoctorEmail }) => {
         flexDirection: "column",
         transition: "border-color 0.15s ease, box-shadow 0.15s ease",
         "&:hover": {
-          borderColor: "#D1D5DB",
+          borderColor: "#CBD5E1",
           boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
         },
       }}
@@ -89,7 +71,7 @@ const TestCard = ({ test, onDelete, onDataDelete, currentDoctorEmail }) => {
               fontFamily: '"DM Sans", sans-serif',
               fontSize: 15,
               fontWeight: 600,
-              color: "#0D1117",
+              color: "#111827",
               lineHeight: 1.3,
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -110,15 +92,7 @@ const TestCard = ({ test, onDelete, onDataDelete, currentDoctorEmail }) => {
           </Typography>
         </Box>
 
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1.5,
-            flexShrink: 0,
-            ml: 2,
-          }}
-        >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexShrink: 0, ml: 2 }}>
           {/* Side badge */}
           <Box
             sx={{
@@ -144,12 +118,7 @@ const TestCard = ({ test, onDelete, onDataDelete, currentDoctorEmail }) => {
           {/* Has data indicator */}
           {test.hasData && (
             <Box
-              sx={{
-                width: 7,
-                height: 7,
-                borderRadius: "50%",
-                bgcolor: "#10B981",
-              }}
+              sx={{ width: 7, height: 7, borderRadius: "50%", bgcolor: "#059669" }}
               title="Con datos"
             />
           )}
@@ -157,17 +126,7 @@ const TestCard = ({ test, onDelete, onDataDelete, currentDoctorEmail }) => {
       </Box>
 
       {/* Body */}
-      <Box
-        sx={{
-          px: 3,
-          py: 2.5,
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          flexGrow: 1,
-        }}
-      >
-        {/* Description */}
+      <Box sx={{ px: 3, py: 2.5, display: "flex", flexDirection: "column", gap: 2, flexGrow: 1 }}>
         {test.description && (
           <Typography
             sx={{
@@ -186,7 +145,6 @@ const TestCard = ({ test, onDelete, onDataDelete, currentDoctorEmail }) => {
           </Typography>
         )}
 
-        {/* Evaluado */}
         <InfoRow
           icon={
             isPatient ? (
@@ -222,14 +180,11 @@ const TestCard = ({ test, onDelete, onDataDelete, currentDoctorEmail }) => {
           }
         />
 
-        {/* Doctor */}
         <InfoRow
           label="Doctor"
           value={
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <span>
-                Dr. {test.doctorFirstName} {test.doctorLastName}
-              </span>
+              <span>Dr. {test.doctorFirstName} {test.doctorLastName}</span>
               {canDelete && (
                 <Box
                   sx={{
@@ -250,7 +205,6 @@ const TestCard = ({ test, onDelete, onDataDelete, currentDoctorEmail }) => {
           }
         />
 
-        {/* Date */}
         <InfoRow label="Creado" value={formatDate(test.dateTime)} />
       </Box>
 
@@ -266,7 +220,6 @@ const TestCard = ({ test, onDelete, onDataDelete, currentDoctorEmail }) => {
           gap: 1,
         }}
       >
-        {/* Tomar medidas — solo si NO tiene datos */}
         {!test.hasData && (
           <ActionBtn
             icon={<AnalyticsIcon sx={{ fontSize: 14 }} />}
@@ -276,7 +229,6 @@ const TestCard = ({ test, onDelete, onDataDelete, currentDoctorEmail }) => {
           />
         )}
 
-        {/* Ver gráficos — solo si tiene datos */}
         {test.hasData && (
           <ActionBtn
             icon={<ShowChartIcon sx={{ fontSize: 14 }} />}
@@ -286,11 +238,20 @@ const TestCard = ({ test, onDelete, onDataDelete, currentDoctorEmail }) => {
           />
         )}
 
+        {test.hasData && (
+          <ActionBtn
+            icon={<AssessmentIcon sx={{ fontSize: 14 }} />}
+            label="Ver informe"
+            onClick={() => navigate(`/informe/${test.testId}`)}
+            variant="secondary"
+          />
+        )}
+
         {canDelete && (
           <ActionBtn
             icon={<DeleteIcon sx={{ fontSize: 13 }} />}
             label="Eliminar test"
-            onClick={handleDelete}
+            onClick={() => setDeleteTestOpen(true)}
             variant="danger"
           />
         )}
@@ -299,11 +260,33 @@ const TestCard = ({ test, onDelete, onDataDelete, currentDoctorEmail }) => {
           <ActionBtn
             icon={<DeleteSweepIcon sx={{ fontSize: 13 }} />}
             label="Eliminar datos"
-            onClick={handleDeleteData}
+            onClick={() => setDeleteDataOpen(true)}
             variant="warning"
           />
         )}
       </Box>
+
+      {/* Confirm: delete test */}
+      <ConfirmDialog
+        open={deleteTestOpen}
+        title="Eliminar test"
+        message={`¿Estás seguro de que deseas eliminar el test "${test.name}"? Esta acción eliminará también todos los datos asociados.`}
+        confirmLabel="Eliminar test"
+        severity="danger"
+        onConfirm={() => { setDeleteTestOpen(false); onDelete(test.testId); }}
+        onCancel={() => setDeleteTestOpen(false)}
+      />
+
+      {/* Confirm: delete data only */}
+      <ConfirmDialog
+        open={deleteDataOpen}
+        title="Eliminar datos del test"
+        message={`¿Estás seguro de que deseas eliminar los datos del test "${test.name}"? El test se conservará pero deberás volver a tomar las medidas.`}
+        confirmLabel="Eliminar datos"
+        severity="warning"
+        onConfirm={() => { setDeleteDataOpen(false); onDataDelete(test.testId); }}
+        onCancel={() => setDeleteDataOpen(false)}
+      />
     </Box>
   );
 };
@@ -325,15 +308,9 @@ const InfoRow = ({ icon, label, value }) => (
       >
         {label}
       </Typography>
-      {/* Añadimos component="div" */}
       <Typography
         component="div"
-        sx={{
-          fontFamily: '"DM Sans", sans-serif',
-          fontSize: 13,
-          color: "#374151",
-          lineHeight: 1.4,
-        }}
+        sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#374151", lineHeight: 1.4 }}
       >
         {value}
       </Typography>
@@ -345,11 +322,11 @@ const ActionBtn = ({ icon, label, onClick, variant }) => {
   const styles = {
     primary: {
       color: "#fff",
-      bgcolor: "#0D1117",
-      "&:hover": { bgcolor: "#1a2332" },
+      bgcolor: "#1B4F8A",
+      "&:hover": { bgcolor: "#153D6B" },
     },
     danger: {
-      color: "#EF4444",
+      color: "#DC2626",
       bgcolor: "transparent",
       border: "1px solid #FECACA",
       "&:hover": { bgcolor: "#FEF2F2" },
@@ -359,6 +336,12 @@ const ActionBtn = ({ icon, label, onClick, variant }) => {
       bgcolor: "transparent",
       border: "1px solid #FDE68A",
       "&:hover": { bgcolor: "#FFFBEB" },
+    },
+    secondary: {
+      color: "#1B4F8A",
+      bgcolor: "transparent",
+      border: "1px solid #BFDBFE",
+      "&:hover": { bgcolor: "#EBF2FB" },
     },
   };
 

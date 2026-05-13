@@ -8,7 +8,6 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
-import { AssignmentAdd } from "@mui/icons-material";
 
 const FormTest = ({
   testName,
@@ -23,16 +22,15 @@ const FormTest = ({
   formTouched,
   handleSubmit,
   loading,
-  responseMessage,
 }) => {
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#F7F6F3", py: 6, px: 3 }}>
+    <Box sx={{ minHeight: "calc(100vh - 64px)", bgcolor: "#F0F4F8", py: 6, px: 3 }}>
       <Box sx={{ maxWidth: 560, mx: "auto" }}>
         <Typography
           sx={{
             fontSize: 28,
             fontWeight: 600,
-            color: "#0D1117",
+            color: "#111827",
             mb: 0.5,
             fontFamily: '"DM Sans", sans-serif',
           }}
@@ -42,7 +40,7 @@ const FormTest = ({
         <Typography
           sx={{
             fontSize: 14,
-            color: "#6B7280",
+            color: "#4B5563",
             mb: 6,
             fontWeight: 300,
             fontFamily: '"DM Sans", sans-serif',
@@ -51,37 +49,12 @@ const FormTest = ({
           Completa la información para registrar la evaluación
         </Typography>
 
-        {responseMessage && (
-          <Box
-            sx={{
-              mb: 4,
-              p: 2,
-              bgcolor: responseMessage.includes("Error")
-                ? "#FEF2F2"
-                : "#ECFDF5",
-              borderRadius: 2,
-              border: "1px solid",
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: 13,
-                color: responseMessage.includes("Error")
-                  ? "#B91C1C"
-                  : "#065F46",
-              }}
-            >
-              {responseMessage}
-            </Typography>
-          </Box>
-        )}
-
         <Box
           component="form"
           onSubmit={handleSubmit}
           sx={{
             bgcolor: "#fff",
-            border: "1px solid #E5E7EB",
+            border: "1px solid #E2E8F0",
             borderRadius: 2.5,
             p: 4,
             display: "flex",
@@ -113,13 +86,15 @@ const FormTest = ({
                     borderRadius: 1.5,
                     textAlign: "center",
                     cursor: "pointer",
-                    bgcolor: side === opt ? "#0D1117" : "#fff",
+                    bgcolor: side === opt ? "#1B4F8A" : "#fff",
                     color: side === opt ? "#fff" : "#374151",
                     border: "1px solid",
-                    borderColor: side === opt ? "#0D1117" : "#E5E7EB",
+                    borderColor: side === opt ? "#1B4F8A" : "#E2E8F0",
                     fontWeight: 500,
                     fontSize: 13,
-                    transition: "0.2s",
+                    fontFamily: '"DM Sans", sans-serif',
+                    transition: "0.15s",
+                    userSelect: "none",
                   }}
                 >
                   {opt.charAt(0).toUpperCase() + opt.slice(1)}
@@ -153,23 +128,15 @@ const FormTest = ({
                 Selecciona un evaluado
               </MenuItem>
               {evaluados.map((ev) => (
-                <MenuItem
-                  key={ev.id || ev.idEvaluado}
-                  value={ev.id || ev.idEvaluado}
-                >
+                <MenuItem key={ev.id || ev.idEvaluado} value={ev.id || ev.idEvaluado}>
                   {ev.nombre || ev.name}
                 </MenuItem>
               ))}
             </Select>
           </Box>
 
-          <Button
-            type="submit"
-            fullWidth
-            disabled={loading}
-            sx={submitBtnStyle}
-          >
-            {loading ? <CircularProgress size={20} /> : "Crear test"}
+          <Button type="submit" fullWidth disabled={loading} sx={submitBtnStyle}>
+            {loading ? <CircularProgress size={20} sx={{ color: "#9CA3AF" }} /> : "Crear test"}
           </Button>
         </Box>
       </Box>
@@ -177,7 +144,6 @@ const FormTest = ({
   );
 };
 
-// Estilos rápidos para limpiar el código
 const labelStyle = {
   fontFamily: '"DM Sans", sans-serif',
   fontSize: 12,
@@ -185,17 +151,37 @@ const labelStyle = {
   color: "#374151",
   mb: 1,
 };
+
 const inputStyle = {
-  "& .MuiOutlinedInput-root": { borderRadius: 1.5, fontSize: 13 },
+  "& .MuiOutlinedInput-root": {
+    borderRadius: 1.5,
+    fontSize: 13,
+    fontFamily: '"DM Sans", sans-serif',
+    "& fieldset": { borderColor: "#E2E8F0" },
+    "&:hover fieldset": { borderColor: "#9CA3AF" },
+    "&.Mui-focused fieldset": { borderColor: "#1B4F8A", borderWidth: 1.5 },
+  },
 };
-const selectStyle = { borderRadius: 1.5, fontSize: 13 };
+
+const selectStyle = {
+  borderRadius: 1.5,
+  fontSize: 13,
+  fontFamily: '"DM Sans", sans-serif',
+  "& .MuiOutlinedInput-notchedOutline": { borderColor: "#E2E8F0" },
+  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#9CA3AF" },
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#1B4F8A", borderWidth: 1.5 },
+};
+
 const submitBtnStyle = {
   height: 48,
-  bgcolor: "#0D1117",
+  bgcolor: "#1B4F8A",
   color: "#fff",
   borderRadius: 1.5,
   textTransform: "none",
-  "&:hover": { bgcolor: "#1a2332" },
+  fontFamily: '"DM Sans", sans-serif',
+  fontWeight: 500,
+  "&:hover": { bgcolor: "#153D6B" },
+  "&:disabled": { bgcolor: "#F3F4F6", color: "#9CA3AF" },
 };
 
 export default FormTest;

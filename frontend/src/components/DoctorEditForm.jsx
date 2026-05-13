@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Drawer,
   TextField,
@@ -7,22 +7,33 @@ import {
   Typography,
   CircularProgress,
   IconButton,
-  Divider,
 } from "@mui/material";
-import { Close as CloseIcon, PersonAdd as PersonAddIcon } from "@mui/icons-material";
+import { Close as CloseIcon, EditOutlined as EditIcon } from "@mui/icons-material";
+import { doctorService } from "../services/doctorService";
 
-const DoctorForm = ({ open, onClose, onSuccess }) => {
+const DoctorEditForm = ({ open, onClose, doctor, onSuccess }) => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    email: "",
-    password: "",
     speciality: "",
     medicalCenter: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
+
+  useEffect(() => {
+    if (doctor) {
+      setFormData({
+        firstName: doctor.firstName || "",
+        lastName: doctor.lastName || "",
+        speciality: doctor.speciality || "",
+        medicalCenter: doctor.medicalCenter || "",
+      });
+      setError("");
+      setFieldErrors({});
+    }
+  }, [doctor]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,50 +44,41 @@ const DoctorForm = ({ open, onClose, onSuccess }) => {
 
   const validateFields = () => {
     const errors = {};
-    Object.entries(formData).forEach(([key, value]) => {
-      if (!value.trim()) errors[key] = true;
-    });
+    if (!formData.firstName.trim()) errors.firstName = true;
+    if (!formData.lastName.trim()) errors.lastName = true;
     return errors;
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     setError("");
     const errors = validateFields();
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
-      setError("Por favor completa todos los campos.");
+      setError("Nombre y apellido son obligatorios.");
       return;
     }
     setLoading(true);
     try {
-      await onSuccess(formData);
-      setFormData({ firstName: "", lastName: "", email: "", password: "", speciality: "", medicalCenter: "" });
-      setFieldErrors({});
+      const updated = await doctorService.updateDoctor(doctor.id, formData);
+      onSuccess(updated);
       onClose();
-    } catch (error) {
-      setError(error.message);
+    } catch (err) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   const handleClose = () => {
-    if (!loading) {
-      setFormData({ firstName: "", lastName: "", email: "", password: "", speciality: "", medicalCenter: "" });
-      setError("");
-      setFieldErrors({});
-      onClose();
-    }
+    if (!loading) onClose();
   };
 
   const fields = [
-    { name: "firstName", label: "Nombre", type: "text", half: true },
-    { name: "lastName", label: "Apellido", type: "text", half: true },
-    { name: "email", label: "Correo electrónico", type: "email", half: false },
-    { name: "password", label: "Contraseña", type: "password", half: false },
-    { name: "speciality", label: "Especialidad", type: "text", half: true },
-    { name: "medicalCenter", label: "Centro médico", type: "text", half: true },
+    { name: "firstName", label: "Nombre", half: true },
+    { name: "lastName", label: "Apellido", half: true },
+    { name: "speciality", label: "Especialidad", half: false },
+    { name: "medicalCenter", label: "Centro médico", half: false },
   ];
 
   return (
@@ -117,15 +119,17 @@ const DoctorForm = ({ open, onClose, onSuccess }) => {
               justifyContent: "center",
             }}
           >
-            <PersonAddIcon sx={{ fontSize: 18, color: "#1B4F8A" }} />
+            <EditIcon sx={{ fontSize: 18, color: "#1B4F8A" }} />
           </Box>
           <Box>
             <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 16, fontWeight: 600, color: "#111827" }}>
-              Nuevo doctor
+              Editar doctor
             </Typography>
-            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 12, color: "#6B7280", fontWeight: 300 }}>
-              Completa los datos del profesional
-            </Typography>
+            {doctor && (
+              <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 12, color: "#6B7280", fontWeight: 300 }}>
+                Dr. {doctor.firstName} {doctor.lastName}
+              </Typography>
+            )}
           </Box>
         </Box>
         <IconButton onClick={handleClose} disabled={loading} size="small" sx={{ color: "#9CA3AF" }}>
@@ -133,12 +137,10 @@ const DoctorForm = ({ open, onClose, onSuccess }) => {
         </IconButton>
       </Box>
 
-      {/* Scrollable content */}
+      {/* Content */}
       <Box sx={{ flex: 1, overflowY: "auto", p: 3 }}>
         {error && (
-          <Box
-            sx={{ mb: 3, p: 2, bgcolor: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 1.5 }}
-          >
+          <Box sx={{ mb: 3, p: 2, bgcolor: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 1.5 }}>
             <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#B91C1C" }}>
               {error}
             </Typography>
@@ -150,15 +152,11 @@ const DoctorForm = ({ open, onClose, onSuccess }) => {
           onSubmit={handleSubmit}
           sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2.5 }}
         >
-          {fields.map(({ name, label, type, half }) => (
-            <Box
-              key={name}
-              sx={{ gridColumn: half ? "span 1" : "span 2" }}
-            >
+          {fields.map(({ name, label, half }) => (
+            <Box key={name} sx={{ gridColumn: half ? "span 1" : "span 2" }}>
               <Typography sx={labelStyle}>{label}</Typography>
               <TextField
                 name={name}
-                type={type}
                 value={formData[name]}
                 onChange={handleChange}
                 disabled={loading}
@@ -175,9 +173,21 @@ const DoctorForm = ({ open, onClose, onSuccess }) => {
             </Box>
           ))}
         </Box>
+
+        {/* Email — readonly info */}
+        {doctor?.email && (
+          <Box sx={{ mt: 3, p: 2, bgcolor: "#F8FAFC", border: "1px solid #F1F5F9", borderRadius: 1.5 }}>
+            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 11, color: "#94A3B8", mb: 0.25 }}>
+              Correo electrónico (no editable)
+            </Typography>
+            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#475569" }}>
+              {doctor.email}
+            </Typography>
+          </Box>
+        )}
       </Box>
 
-      {/* Sticky footer */}
+      {/* Footer */}
       <Box
         sx={{
           display: "flex",
@@ -194,7 +204,7 @@ const DoctorForm = ({ open, onClose, onSuccess }) => {
           Cancelar
         </Button>
         <Button onClick={handleSubmit} disabled={loading} sx={submitBtnStyle}>
-          {loading ? <CircularProgress size={16} sx={{ color: "#9CA3AF" }} /> : "Agregar doctor"}
+          {loading ? <CircularProgress size={16} sx={{ color: "#9CA3AF" }} /> : "Guardar cambios"}
         </Button>
       </Box>
     </Drawer>
@@ -250,4 +260,4 @@ const submitBtnStyle = {
   "&:disabled": { bgcolor: "#F3F4F6", color: "#9CA3AF" },
 };
 
-export default DoctorForm;
+export default DoctorEditForm;

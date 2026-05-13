@@ -10,7 +10,7 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Visibility, VisibilityOff, MonitorHeart } from "@mui/icons-material";
 import { authService } from "../services/authService";
 
 const LoginScreen = () => {
@@ -30,10 +30,7 @@ const LoginScreen = () => {
     setLoading(true);
     setError("");
     try {
-      const response = await authService.login(
-        formData.email,
-        formData.password,
-      );
+      const response = await authService.login(formData.email, formData.password);
       authService.setToken(response.accessToken);
       const userRole = authService.getUserRole();
       if (userRole === "ADMIN") navigate("/admin");
@@ -52,7 +49,7 @@ const LoginScreen = () => {
         minHeight: "100vh",
         display: "grid",
         gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-        bgcolor: "#F7F6F3",
+        bgcolor: "#F0F4F8",
       }}
     >
       {/* Left panel — brand */}
@@ -61,20 +58,13 @@ const LoginScreen = () => {
           display: { xs: "none", md: "flex" },
           flexDirection: "column",
           justifyContent: "space-between",
-          bgcolor: "#0D1117",
+          bgcolor: "#1B4F8A",
           p: 6,
         }}
       >
         <Box>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-            <Box
-              sx={{
-                width: 10,
-                height: 10,
-                borderRadius: "50%",
-                bgcolor: "#4ECBA0",
-              }}
-            />
+            <MonitorHeart sx={{ fontSize: 22, color: "#EBF2FB" }} />
             <Typography
               sx={{
                 color: "#fff",
@@ -102,13 +92,13 @@ const LoginScreen = () => {
           >
             Evaluación clínica
             <br />
-            <Box component="span" sx={{ color: "#4ECBA0" }}>
+            <Box component="span" sx={{ color: "#93C5FD" }}>
               basada en datos.
             </Box>
           </Typography>
           <Typography
             sx={{
-              color: "rgba(255,255,255,0.4)",
+              color: "rgba(255,255,255,0.55)",
               fontFamily: '"DM Sans", sans-serif',
               fontSize: 14,
               fontWeight: 300,
@@ -123,7 +113,7 @@ const LoginScreen = () => {
 
         <Typography
           sx={{
-            color: "rgba(255,255,255,0.2)",
+            color: "rgba(255,255,255,0.25)",
             fontFamily: '"DM Sans", sans-serif',
             fontSize: 12,
           }}
@@ -151,19 +141,13 @@ const LoginScreen = () => {
               mb: 6,
             }}
           >
-            <Box
-              sx={{
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                bgcolor: "#4ECBA0",
-              }}
-            />
+            <MonitorHeart sx={{ fontSize: 20, color: "#1B4F8A" }} />
             <Typography
               sx={{
                 fontFamily: '"DM Sans", sans-serif',
-                fontWeight: 500,
+                fontWeight: 600,
                 fontSize: 14,
+                color: "#111827",
               }}
             >
               Parkinson Tap
@@ -175,7 +159,7 @@ const LoginScreen = () => {
               fontFamily: '"DM Sans", sans-serif',
               fontSize: 26,
               fontWeight: 500,
-              color: "#0D1117",
+              color: "#111827",
               mb: 1,
             }}
           >
@@ -185,7 +169,7 @@ const LoginScreen = () => {
             sx={{
               fontFamily: '"DM Sans", sans-serif',
               fontSize: 14,
-              color: "#6B7280",
+              color: "#4B5563",
               fontWeight: 300,
               mb: 5,
             }}
@@ -255,11 +239,7 @@ const LoginScreen = () => {
                         size="small"
                         sx={{ color: "#9CA3AF" }}
                       >
-                        {showPassword ? (
-                          <VisibilityOff fontSize="small" />
-                        ) : (
-                          <Visibility fontSize="small" />
-                        )}
+                        {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -275,7 +255,7 @@ const LoginScreen = () => {
               sx={{
                 mt: 1,
                 height: 48,
-                bgcolor: "#0D1117",
+                bgcolor: "#1B4F8A",
                 color: "#fff",
                 borderRadius: 1.5,
                 fontFamily: '"DM Sans", sans-serif',
@@ -283,7 +263,7 @@ const LoginScreen = () => {
                 fontSize: 14,
                 textTransform: "none",
                 letterSpacing: "0.01em",
-                "&:hover": { bgcolor: "#1a2332" },
+                "&:hover": { bgcolor: "#153D6B" },
                 "&:disabled": { bgcolor: "#D1D5DB", color: "#9CA3AF" },
                 transition: "background-color 0.2s ease",
               }}
@@ -315,11 +295,11 @@ const inputStyle = {
     fontFamily: '"DM Sans", sans-serif',
     fontSize: 14,
     bgcolor: "#fff",
-    "& fieldset": { borderColor: "#E5E7EB", borderWidth: 1 },
+    "& fieldset": { borderColor: "#E2E8F0", borderWidth: 1 },
     "&:hover fieldset": { borderColor: "#9CA3AF" },
-    "&.Mui-focused fieldset": { borderColor: "#0D1117", borderWidth: 1.5 },
+    "&.Mui-focused fieldset": { borderColor: "#1B4F8A", borderWidth: 1.5 },
   },
-  "& input": { py: 1.5, px: 1.75, color: "#0D1117" },
+  "& input": { py: 1.5, px: 1.75, color: "#111827" },
   "& input::placeholder": { color: "#9CA3AF", opacity: 1 },
 };
 

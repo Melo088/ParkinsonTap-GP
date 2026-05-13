@@ -17,7 +17,7 @@ const UnauthorizedScreen = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#F7F6F3",
+        bgcolor: "#F0F4F8",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -31,7 +31,7 @@ const UnauthorizedScreen = () => {
             fontFamily: '"DM Sans", sans-serif',
             fontSize: 96,
             fontWeight: 700,
-            color: "#E5E7EB",
+            color: "#E2E8F0",
             lineHeight: 1,
             mb: 2,
             letterSpacing: "-0.04em",
@@ -45,7 +45,7 @@ const UnauthorizedScreen = () => {
             fontFamily: '"DM Sans", sans-serif',
             fontSize: 22,
             fontWeight: 500,
-            color: "#0D1117",
+            color: "#111827",
             mb: 1.5,
           }}
         >
@@ -72,14 +72,14 @@ const UnauthorizedScreen = () => {
             sx={{
               height: 44,
               px: 3.5,
-              bgcolor: "#0D1117",
+              bgcolor: "#111827",
               color: "#fff",
               borderRadius: 1.5,
               fontFamily: '"DM Sans", sans-serif',
               fontWeight: 500,
               fontSize: 13,
               textTransform: "none",
-              "&:hover": { bgcolor: "#1a2332" },
+              "&:hover": { bgcolor: "#153D6B" },
             }}
           >
             Volver al inicio
@@ -94,7 +94,7 @@ const UnauthorizedScreen = () => {
               px: 3.5,
               bgcolor: "transparent",
               color: "#6B7280",
-              border: "1px solid #E5E7EB",
+              border: "1px solid #E2E8F0",
               borderRadius: 1.5,
               fontFamily: '"DM Sans", sans-serif',
               fontWeight: 400,

@@ -6,13 +6,14 @@
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
+#include "secrets.h"
 
-const char* ssid = "";
-const char* password = "";
+const char* ssid = WIFI_SSID;
+const char* password = WIFI_PASSWORD;
 
 // MQTT params
-const char* mqttServer = "broker.emqx.io";
-const int mqttPort = 1883;
+const char* mqttServer = MQTT_SERVER;
+const int mqttPort = MQTT_PORT;
 const char* clientName = "ESP32ClienteIcesiMelo";
 
 // Objeto WiFiClient
@@ -22,10 +23,10 @@ WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 
 // Configuración del topic
-const char* topic = "esp32/data";
-const char* responseTopic = "esp32/response";
+const char* topic = "parkinsontap/icesi/cmd";
+const char* responseTopic = "parkinsontap/icesi/response";
 
-String url = "http://192.168.130.56:8080/api/esp32/batch-readings";
+String url = BACKEND_URL;
 
 // Variables para el cálculo de ángulos
 double compAngleX = 0, compAngleY = 0, compAngleZ = 0;
@@ -350,12 +351,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   // Verificar si el mensaje es un simple "start" (para compatibilidad)
   if(message == "start"){
-    initWiFi();
     if (WiFi.status() == WL_CONNECTED) {
       Serial.println("Realizando HTTP POST con datos del MPU6050 (10s por defecto)...");
-      httpPOST(10); // Duración por defecto
+      httpPOST(10);
     } else {
-      Serial.println("Error: No hay conexión WiFi. Usa 'w' para conectarte primero.");
+      Serial.println("Error: No hay conexión WiFi.");
     }
     return;
   }
@@ -398,7 +398,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
       Serial.println("Duración ajustada a 60 segundos (máximo)");
     }
     
-    initWiFi();
     if (WiFi.status() == WL_CONNECTED) {
       Serial.print("Realizando HTTP POST con datos del MPU6050 por ");
       Serial.print(duration);

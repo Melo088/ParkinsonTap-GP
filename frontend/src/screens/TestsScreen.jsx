@@ -12,15 +12,13 @@ import { Add as AddIcon } from "@mui/icons-material";
 import { evaluatedService } from "../services/testService";
 import TestCard from "../components/TestCard";
 import Grid from "@mui/material/Grid";
-
-console.log("TestScreen loaded");
+import { useSnackbar } from "../context/SnackbarContext";
 
 const TestScreen = () => {
   const navigate = useNavigate();
   const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const { showSuccess, showError } = useSnackbar();
 
   useEffect(() => {
     loadTests();
@@ -43,9 +41,8 @@ const TestScreen = () => {
       );
 
       setTests(testsWithDataInfo);
-      setError("");
     } catch (error) {
-      setError("Error al cargar los tests: " + error.message);
+      showError("Error al cargar los tests: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -55,10 +52,9 @@ const TestScreen = () => {
     try {
       await evaluatedService.deleteTest(testId);
       await loadTests();
-      setSuccess("Test eliminado correctamente.");
-      setTimeout(() => setSuccess(""), 3000);
+      showSuccess("Test eliminado correctamente.");
     } catch (error) {
-      setError("Error al eliminar test: " + error.message);
+      showError("Error al eliminar test: " + error.message);
     }
   };
 
@@ -66,10 +62,9 @@ const TestScreen = () => {
     try {
       await evaluatedService.deleteTestData(testId);
       await loadTests();
-      setSuccess("Datos del test eliminados correctamente.");
-      setTimeout(() => setSuccess(""), 3000);
+      showSuccess("Datos del test eliminados correctamente.");
     } catch (error) {
-      setError("Error al eliminar los datos del test: " + error.message);
+      showError("Error al eliminar los datos del test: " + error.message);
     }
     setTests((prev) =>
       prev.map((t) => (t.testId === testId ? { ...t, hasData: false } : t)),
@@ -80,22 +75,16 @@ const TestScreen = () => {
     return (
       <Box
         sx={{
-          minHeight: "100vh",
-          bgcolor: "#F7F6F3",
+          minHeight: "calc(100vh - 64px)",
+          bgcolor: "#F0F4F8",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
         <Box sx={{ textAlign: "center" }}>
-          <CircularProgress size={32} sx={{ color: "#0D1117", mb: 2 }} />
-          <Typography
-            sx={{
-              fontFamily: '"DM Sans", sans-serif',
-              fontSize: 13,
-              color: "#9CA3AF",
-            }}
-          >
+          <CircularProgress size={32} sx={{ color: "#1B4F8A", mb: 2 }} />
+          <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#9CA3AF" }}>
             Cargando tests…
           </Typography>
         </Box>
@@ -107,7 +96,7 @@ const TestScreen = () => {
   const withoutData = tests.filter((t) => !t.hasData);
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#F7F6F3", pb: 10 }}>
+    <Box sx={{ minHeight: "calc(100vh - 64px)", bgcolor: "#F0F4F8", pb: 10 }}>
       <Container maxWidth="lg" sx={{ pt: 6 }}>
         {/* Page header */}
         <Box
@@ -121,25 +110,10 @@ const TestScreen = () => {
           }}
         >
           <Box>
-            <Typography
-              sx={{
-                fontFamily: '"DM Sans", sans-serif',
-                fontSize: 28,
-                fontWeight: 600,
-                color: "#0D1117",
-                mb: 0.5,
-              }}
-            >
+            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 28, fontWeight: 600, color: "#111827", mb: 0.5 }}>
               Tests
             </Typography>
-            <Typography
-              sx={{
-                fontFamily: '"DM Sans", sans-serif',
-                fontSize: 14,
-                color: "#6B7280",
-                fontWeight: 300,
-              }}
-            >
+            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 14, color: "#4B5563", fontWeight: 300 }}>
               Administra y supervisa todas las evaluaciones
             </Typography>
           </Box>
@@ -153,42 +127,11 @@ const TestScreen = () => {
           </Button>
         </Box>
 
-        {/* Toast */}
-        {(success || error) && (
-          <Box
-            sx={{
-              mb: 4,
-              p: 2,
-              bgcolor: success ? "#ECFDF5" : "#FEF2F2",
-              border: `1px solid ${success ? "#A7F3D0" : "#FECACA"}`,
-              borderRadius: 2,
-            }}
-          >
-            <Typography
-              sx={{
-                fontFamily: '"DM Sans", sans-serif',
-                fontSize: 13,
-                color: success ? "#065F46" : "#B91C1C",
-              }}
-            >
-              {success || error}
-            </Typography>
-          </Box>
-        )}
-
         {/* Stats row */}
         <Box sx={{ display: "flex", gap: 3, mb: 5, flexWrap: "wrap" }}>
           <StatPill label="Total" value={tests.length} />
-          <StatPill
-            label="Con datos"
-            value={withData.length}
-            accent="#10B981"
-          />
-          <StatPill
-            label="Sin datos"
-            value={withoutData.length}
-            accent="#9CA3AF"
-          />
+          <StatPill label="Con datos" value={withData.length} accent="#059669" />
+          <StatPill label="Sin datos" value={withoutData.length} accent="#9CA3AF" />
         </Box>
 
         {/* Empty state */}
@@ -218,15 +161,15 @@ const TestScreen = () => {
             sx={{
               height: 48,
               px: 3,
-              bgcolor: "#0D1117",
+              bgcolor: "#1B4F8A",
               color: "#fff",
               borderRadius: 2,
               fontFamily: '"DM Sans", sans-serif',
               fontWeight: 500,
               fontSize: 13,
               textTransform: "none",
-              boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
-              "&:hover": { bgcolor: "#1a2332" },
+              boxShadow: "0 4px 16px rgba(27,79,138,0.3)",
+              "&:hover": { bgcolor: "#153D6B" },
               gap: 1,
             }}
           >
@@ -238,7 +181,7 @@ const TestScreen = () => {
   );
 };
 
-const StatPill = ({ label, value, accent = "#0D1117" }) => (
+const StatPill = ({ label, value, accent = "#1B4F8A" }) => (
   <Box
     sx={{
       display: "flex",
@@ -247,28 +190,15 @@ const StatPill = ({ label, value, accent = "#0D1117" }) => (
       px: 2.5,
       py: 1.5,
       bgcolor: "#fff",
-      border: "1px solid #E5E7EB",
+      border: "1px solid #E2E8F0",
       borderRadius: 2,
     }}
   >
     <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: accent }} />
-    <Typography
-      sx={{
-        fontFamily: '"DM Sans", sans-serif',
-        fontSize: 13,
-        color: "#6B7280",
-      }}
-    >
+    <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#4B5563" }}>
       {label}
     </Typography>
-    <Typography
-      sx={{
-        fontFamily: '"DM Sans", sans-serif',
-        fontSize: 16,
-        fontWeight: 700,
-        color: "#0D1117",
-      }}
-    >
+    <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 16, fontWeight: 700, color: "#111827" }}>
       {value}
     </Typography>
   </Box>
@@ -278,7 +208,7 @@ const EmptyState = ({ onAdd }) => (
   <Box
     sx={{
       bgcolor: "#fff",
-      border: "1px solid #E5E7EB",
+      border: "1px solid #E2E8F0",
       borderRadius: 2.5,
       py: 10,
       textAlign: "center",
@@ -299,26 +229,10 @@ const EmptyState = ({ onAdd }) => (
     >
       <AddIcon sx={{ fontSize: 20, color: "#9CA3AF" }} />
     </Box>
-    <Typography
-      sx={{
-        fontFamily: '"DM Sans", sans-serif',
-        fontSize: 15,
-        fontWeight: 500,
-        color: "#374151",
-        mb: 1,
-      }}
-    >
+    <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 15, fontWeight: 500, color: "#374151", mb: 1 }}>
       Sin tests registrados
     </Typography>
-    <Typography
-      sx={{
-        fontFamily: '"DM Sans", sans-serif',
-        fontSize: 13,
-        color: "#9CA3AF",
-        fontWeight: 300,
-        mb: 4,
-      }}
-    >
+    <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#9CA3AF", fontWeight: 300, mb: 4 }}>
       Crea el primer test para comenzar
     </Typography>
     <Button onClick={onAdd} sx={primaryBtnStyle}>
@@ -330,14 +244,14 @@ const EmptyState = ({ onAdd }) => (
 const primaryBtnStyle = {
   height: 42,
   px: 3,
-  bgcolor: "#0D1117",
+  bgcolor: "#1B4F8A",
   color: "#fff",
   borderRadius: 1.5,
   fontFamily: '"DM Sans", sans-serif',
   fontWeight: 500,
   fontSize: 13,
   textTransform: "none",
-  "&:hover": { bgcolor: "#1a2332" },
+  "&:hover": { bgcolor: "#153D6B" },
 };
 
 export default TestScreen;

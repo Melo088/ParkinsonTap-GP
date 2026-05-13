@@ -1,6 +1,7 @@
 package org.example.parkinsontapweb.controller;
 
 import org.example.parkinsontapweb.dto.DoctorDTO;
+import org.example.parkinsontapweb.dto.DoctorUpdateDTO;
 import org.example.parkinsontapweb.entity.Doctor;
 import org.example.parkinsontapweb.entity.Role;
 import org.example.parkinsontapweb.entity.Test;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +45,6 @@ public class DoctorController {
         this.testRepository = testRepository;
     }
 
-    // Endpoint para obtener todos los doctores - Solo ADMIN
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<DoctorDTO>> getAllDoctors() {
@@ -54,9 +55,39 @@ public class DoctorController {
         return ResponseEntity.ok(doctorDtos);
     }
 
-    // Method to register doctors - Solo ADMIN
+    @GetMapping("/me")
+    @PreAuthorize("hasAuthority('DOCTOR')")
+    public ResponseEntity<?> getMyProfile(Authentication auth) {
+        Doctor doctor = doctorRepository.findByEmail(auth.getName());
+        if (doctor == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Doctor not found"));
+        }
+        return ResponseEntity.ok(new DoctorDTO(doctor));
+    }
+
+    @PutMapping("/me")
+    @PreAuthorize("hasAuthority('DOCTOR')")
+    public ResponseEntity<?> updateMyProfile(@RequestBody DoctorUpdateDTO dto, Authentication auth) {
+        Doctor doctor = doctorRepository.findByEmail(auth.getName());
+        if (doctor == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Doctor not found"));
+        }
+        if (dto.getFirstName() != null && !dto.getFirstName().isBlank())
+            doctor.setFirstName(dto.getFirstName());
+        if (dto.getLastName() != null && !dto.getLastName().isBlank())
+            doctor.setLastName(dto.getLastName());
+        if (dto.getSpeciality() != null)
+            doctor.setSpeciality(dto.getSpeciality());
+        if (dto.getMedicalCenter() != null)
+            doctor.setMedicalCenter(dto.getMedicalCenter());
+        doctorRepository.save(doctor);
+        return ResponseEntity.ok(new DoctorDTO(doctor));
+    }
+
     @PostMapping("/register")
-    @PreAuthorize("hasAuthority('ADMIN')") // Cambiado a hasRole
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, String>> registerDoctor(@RequestBody Doctor doctor) {
         if (doctorRepository.existsByEmail(doctor.getEmail())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -72,6 +103,26 @@ public class DoctorController {
         return ResponseEntity.ok(Map.of("message", "Doctor was registered successfully"));
     }
 
+    @PutMapping("/update/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> updateDoctor(@PathVariable Integer id, @RequestBody DoctorUpdateDTO dto) {
+        Doctor doctor = doctorRepository.findById(id).orElse(null);
+        if (doctor == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Doctor not found"));
+        }
+        if (dto.getFirstName() != null && !dto.getFirstName().isBlank())
+            doctor.setFirstName(dto.getFirstName());
+        if (dto.getLastName() != null && !dto.getLastName().isBlank())
+            doctor.setLastName(dto.getLastName());
+        if (dto.getSpeciality() != null)
+            doctor.setSpeciality(dto.getSpeciality());
+        if (dto.getMedicalCenter() != null)
+            doctor.setMedicalCenter(dto.getMedicalCenter());
+        doctorRepository.save(doctor);
+        return ResponseEntity.ok(new DoctorDTO(doctor));
+    }
+
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, String>> deleteDoctor(@PathVariable Integer id) {
@@ -80,21 +131,15 @@ public class DoctorController {
                     .body(Map.of("message", "Doctor not found"));
         }
 
-        // Buscar tests relacionados con ese doctor
         List<Test> myTests = testRepository.findByDoctorId(id);
-
         if (!myTests.isEmpty()) {
-            // Desvincular doctor de cada test
             for (Test test : myTests) {
                 test.setDoctor(null);
             }
-            // Guardar los tests actualizados
             testRepository.saveAll(myTests);
         }
-        // borrar doctor
         doctorRepository.deleteById(id);
 
         return ResponseEntity.ok(Map.of("message", "Doctor was deleted"));
     }
-
 }

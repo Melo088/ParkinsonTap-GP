@@ -38,6 +38,25 @@ export const evaluatedService = {
         }
     },
     
+    // Actualizar evaluado
+    updateEvaluated: async (evaluatedId, data) => {
+        try {
+        const response = await authService.fetchWithAuth(`/evaluated/update/${evaluatedId}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al actualizar evaluado');
+        }
+
+        return await response.json();
+        } catch (error) {
+        throw new Error(error.message || 'Error al actualizar evaluado');
+        }
+    },
+
     // Eliminar evaluado
     deleteEvaluated: async (evaluatedId) => {
         try {

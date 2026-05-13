@@ -3,9 +3,6 @@ import {
   Typography,
   Button,
   Box,
-  Chip,
-  Select,
-  MenuItem,
   CircularProgress,
   LinearProgress,
 } from "@mui/material";
@@ -15,13 +12,7 @@ import {
   ErrorOutline,
 } from "@mui/icons-material";
 
-function DataAcquisitionButton({
-  testId,
-  onStartTest,
-  isLoading,
-  status,
-  error,
-}) {
+function DataAcquisitionButton({ testId, onStartTest, isLoading, status, error }) {
   const [duration, setDuration] = useState(10);
 
   const durationOptions = [
@@ -39,25 +30,25 @@ function DataAcquisitionButton({
   const statusConfig = {
     collecting: {
       label: "Recolectando datos del sensor…",
-      color: "#F59E0B",
+      color: "#D97706",
       bg: "#FFFBEB",
       border: "#FDE68A",
     },
     uploading: {
       label: "Enviando datos al servidor…",
-      color: "#3B82F6",
-      bg: "#EFF6FF",
+      color: "#1B4F8A",
+      bg: "#EBF2FB",
       border: "#BFDBFE",
     },
     success: {
       label: "Datos enviados correctamente",
-      color: "#10B981",
+      color: "#059669",
       bg: "#ECFDF5",
       border: "#A7F3D0",
     },
     error: {
       label: error || "Error en la transmisión de datos",
-      color: "#EF4444",
+      color: "#DC2626",
       bg: "#FEF2F2",
       border: "#FECACA",
     },
@@ -69,7 +60,7 @@ function DataAcquisitionButton({
     <Box
       sx={{
         bgcolor: "#fff",
-        border: "1px solid #E5E7EB",
+        border: "1px solid #E2E8F0",
         borderRadius: 2.5,
         p: { xs: 3, sm: 4 },
         maxWidth: 520,
@@ -78,25 +69,10 @@ function DataAcquisitionButton({
     >
       {/* Header */}
       <Box sx={{ mb: 3 }}>
-        <Typography
-          sx={{
-            fontFamily: '"DM Sans", sans-serif',
-            fontSize: 18,
-            fontWeight: 600,
-            color: "#0D1117",
-            mb: 0.5,
-          }}
-        >
+        <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 18, fontWeight: 600, color: "#111827", mb: 0.5 }}>
           Toma de datos
         </Typography>
-        <Typography
-          sx={{
-            fontFamily: '"DM Sans", sans-serif',
-            fontSize: 13,
-            color: "#6B7280",
-            fontWeight: 300,
-          }}
-        >
+        <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#4B5563", fontWeight: 300 }}>
           Selecciona la duración e inicia la prueba
         </Typography>
       </Box>
@@ -111,26 +87,12 @@ function DataAcquisitionButton({
               gap: 1,
               px: 1.5,
               py: 0.75,
-              bgcolor: "#F3F4F6",
+              bgcolor: "#EBF2FB",
               borderRadius: 1.5,
             }}
           >
-            <Box
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                bgcolor: "#4ECBA0",
-              }}
-            />
-            <Typography
-              sx={{
-                fontFamily: '"DM Sans", sans-serif',
-                fontSize: 12,
-                color: "#374151",
-                fontWeight: 500,
-              }}
-            >
+            <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: "#1B4F8A" }} />
+            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 12, color: "#1B4F8A", fontWeight: 500 }}>
               Test #{testId}
             </Typography>
           </Box>
@@ -139,15 +101,7 @@ function DataAcquisitionButton({
 
       {/* Duration selector */}
       <Box sx={{ mb: 3 }}>
-        <Typography
-          sx={{
-            fontFamily: '"DM Sans", sans-serif',
-            fontSize: 12,
-            fontWeight: 500,
-            color: "#374151",
-            mb: 1,
-          }}
-        >
+        <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 12, fontWeight: 500, color: "#374151", mb: 1 }}>
           Duración
         </Typography>
         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
@@ -159,8 +113,8 @@ function DataAcquisitionButton({
                 px: 2,
                 py: 0.875,
                 border: "1px solid",
-                borderColor: duration === opt.value ? "#0D1117" : "#E5E7EB",
-                bgcolor: duration === opt.value ? "#0D1117" : "#fff",
+                borderColor: duration === opt.value ? "#1B4F8A" : "#E2E8F0",
+                bgcolor: duration === opt.value ? "#1B4F8A" : "#fff",
                 color: duration === opt.value ? "#fff" : "#374151",
                 borderRadius: 1.5,
                 fontFamily: '"DM Sans", sans-serif',
@@ -192,46 +146,18 @@ function DataAcquisitionButton({
           }}
         >
           <Box>
-            <Typography
-              sx={{
-                fontFamily: '"DM Sans", sans-serif',
-                fontSize: 11,
-                color: "#9CA3AF",
-                mb: 0.25,
-              }}
-            >
+            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 11, color: "#9CA3AF", mb: 0.25 }}>
               DURACIÓN
             </Typography>
-            <Typography
-              sx={{
-                fontFamily: '"DM Sans", sans-serif',
-                fontSize: 14,
-                color: "#0D1117",
-                fontWeight: 500,
-              }}
-            >
+            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 14, color: "#111827", fontWeight: 500 }}>
               {duration} segundos
             </Typography>
           </Box>
           <Box sx={{ textAlign: "right" }}>
-            <Typography
-              sx={{
-                fontFamily: '"DM Sans", sans-serif',
-                fontSize: 11,
-                color: "#9CA3AF",
-                mb: 0.25,
-              }}
-            >
+            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 11, color: "#9CA3AF", mb: 0.25 }}>
               MUESTRAS APROX.
             </Typography>
-            <Typography
-              sx={{
-                fontFamily: '"DM Sans", sans-serif',
-                fontSize: 14,
-                color: "#0D1117",
-                fontWeight: 500,
-              }}
-            >
+            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 14, color: "#111827", fontWeight: 500 }}>
               ~{Math.round(duration * 25)} @ 25 Hz
             </Typography>
           </Box>
@@ -261,21 +187,12 @@ function DataAcquisitionButton({
               <CircularProgress size={14} sx={{ color: currentStatus.color }} />
             )}
             {status === "success" && (
-              <CheckCircleOutline
-                sx={{ fontSize: 16, color: currentStatus.color }}
-              />
+              <CheckCircleOutline sx={{ fontSize: 16, color: currentStatus.color }} />
             )}
             {status === "error" && (
               <ErrorOutline sx={{ fontSize: 16, color: currentStatus.color }} />
             )}
-            <Typography
-              sx={{
-                fontFamily: '"DM Sans", sans-serif',
-                fontSize: 13,
-                fontWeight: 500,
-                color: currentStatus.color,
-              }}
-            >
+            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, fontWeight: 500, color: currentStatus.color }}>
               {currentStatus.label}
             </Typography>
           </Box>
@@ -308,14 +225,14 @@ function DataAcquisitionButton({
           }
           sx={{
             height: 46,
-            bgcolor: "#0D1117",
+            bgcolor: "#1B4F8A",
             color: "#fff",
             borderRadius: 1.5,
             fontFamily: '"DM Sans", sans-serif',
             fontWeight: 500,
             fontSize: 13,
             textTransform: "none",
-            "&:hover": { bgcolor: "#1a2332" },
+            "&:hover": { bgcolor: "#153D6B" },
             "&:disabled": { bgcolor: "#F3F4F6", color: "#9CA3AF" },
           }}
         >
@@ -328,14 +245,14 @@ function DataAcquisitionButton({
             sx={{
               height: 46,
               px: 2.5,
-              border: "1px solid #E5E7EB",
+              border: "1px solid #E2E8F0",
               color: "#374151",
               borderRadius: 1.5,
               fontFamily: '"DM Sans", sans-serif',
               fontWeight: 400,
               fontSize: 13,
               textTransform: "none",
-              "&:hover": { bgcolor: "#F9FAFB" },
+              "&:hover": { bgcolor: "#F0F4F8" },
               whiteSpace: "nowrap",
             }}
           >

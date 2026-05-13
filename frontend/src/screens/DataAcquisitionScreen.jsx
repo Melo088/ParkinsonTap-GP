@@ -3,10 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Box, Typography, Button } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import DataAcquisitionButton from "../components/DataAcquisitionButton";
-import {
-  connectMQTT,
-  sendStartMessage,
-} from "../services/dataAcquisitionService";
+import { connectMQTT, sendStartMessage } from "../services/dataAcquisitionService";
 
 function DataAcquisitionScreen() {
   const { testId } = useParams();
@@ -30,7 +27,7 @@ function DataAcquisitionScreen() {
         if (status === "collecting") setStatus("uploading");
       }, duration * 1000);
 
-      const result = await sendStartMessage(testId, duration);
+      await sendStartMessage(testId, duration);
       setStatus("success");
       setIsLoading(false);
 
@@ -45,7 +42,7 @@ function DataAcquisitionScreen() {
   };
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#F7F6F3", py: 6, px: 3 }}>
+    <Box sx={{ minHeight: "calc(100vh - 64px)", bgcolor: "#F0F4F8", py: 6, px: 3 }}>
       <Box sx={{ maxWidth: 600, mx: "auto" }}>
         {/* Page header */}
         <Box sx={{ mb: 6 }}>
@@ -55,12 +52,12 @@ function DataAcquisitionScreen() {
             sx={{
               fontFamily: '"DM Sans", sans-serif',
               fontSize: 13,
-              color: "#6B7280",
+              color: "#4B5563",
               textTransform: "none",
               fontWeight: 400,
               p: 0,
               mb: 3,
-              "&:hover": { bgcolor: "transparent", color: "#374151" },
+              "&:hover": { bgcolor: "transparent", color: "#111827" },
             }}
           >
             Volver a tests
@@ -71,7 +68,7 @@ function DataAcquisitionScreen() {
               fontFamily: '"DM Sans", sans-serif',
               fontSize: 28,
               fontWeight: 600,
-              color: "#0D1117",
+              color: "#111827",
               mb: 1,
             }}
           >
@@ -81,7 +78,7 @@ function DataAcquisitionScreen() {
             sx={{
               fontFamily: '"DM Sans", sans-serif',
               fontSize: 14,
-              color: "#6B7280",
+              color: "#4B5563",
               fontWeight: 300,
             }}
           >
@@ -100,13 +97,7 @@ function DataAcquisitionScreen() {
               mb: 4,
             }}
           >
-            <Typography
-              sx={{
-                fontFamily: '"DM Sans", sans-serif',
-                fontSize: 13,
-                color: "#92400E",
-              }}
-            >
+            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#92400E" }}>
               No se ha proporcionado un ID de test válido en la URL.
             </Typography>
           </Box>

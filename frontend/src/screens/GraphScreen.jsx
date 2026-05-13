@@ -46,37 +46,23 @@ const GraphScreen = () => {
     }
   };
 
-  /* ── No testId ── */
   if (!testId) {
     return (
       <CenteredMessage>
         <Typography sx={headingStyle}>ID no encontrado</Typography>
-        <Typography sx={subStyle}>
-          No se proporcionó un ID de test válido en la URL.
-        </Typography>
-        <Button
-          onClick={() => navigate("/tests")}
-          sx={backBtnStyle}
-          startIcon={<ArrowBack sx={{ fontSize: 15 }} />}
-        >
+        <Typography sx={subStyle}>No se proporcionó un ID de test válido en la URL.</Typography>
+        <Button onClick={() => navigate("/tests")} sx={backBtnStyle} startIcon={<ArrowBack sx={{ fontSize: 15 }} />}>
           Volver a tests
         </Button>
       </CenteredMessage>
     );
   }
 
-  /* ── Loading ── */
   if (loading) {
     return (
       <CenteredMessage>
-        <CircularProgress size={32} sx={{ color: "#0D1117", mb: 2 }} />
-        <Typography
-          sx={{
-            fontFamily: '"DM Sans", sans-serif',
-            fontSize: 13,
-            color: "#9CA3AF",
-          }}
-        >
+        <CircularProgress size={32} sx={{ color: "#1B4F8A", mb: 2 }} />
+        <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#9CA3AF" }}>
           Cargando datos del test…
         </Typography>
       </CenteredMessage>
@@ -84,7 +70,7 @@ const GraphScreen = () => {
   }
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#F7F6F3", pb: 8 }}>
+    <Box sx={{ minHeight: "calc(100vh - 64px)", bgcolor: "#F0F4F8", pb: 8 }}>
       <Container maxWidth="xl" sx={{ pt: 6 }}>
         {/* Page header */}
         <Box sx={{ mb: 6 }}>
@@ -94,46 +80,23 @@ const GraphScreen = () => {
             sx={{
               fontFamily: '"DM Sans", sans-serif',
               fontSize: 13,
-              color: "#6B7280",
+              color: "#4B5563",
               textTransform: "none",
               fontWeight: 400,
               p: 0,
               mb: 3,
-              "&:hover": { bgcolor: "transparent", color: "#374151" },
+              "&:hover": { bgcolor: "transparent", color: "#111827" },
             }}
           >
             Volver a tests
           </Button>
 
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-              gap: 3,
-            }}
-          >
+          <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 3 }}>
             <Box>
-              <Typography
-                sx={{
-                  fontFamily: '"DM Sans", sans-serif',
-                  fontSize: 28,
-                  fontWeight: 600,
-                  color: "#0D1117",
-                  mb: 0.5,
-                }}
-              >
+              <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 28, fontWeight: 600, color: "#111827", mb: 0.5 }}>
                 Análisis de datos
               </Typography>
-              <Typography
-                sx={{
-                  fontFamily: '"DM Sans", sans-serif',
-                  fontSize: 14,
-                  color: "#6B7280",
-                  fontWeight: 300,
-                }}
-              >
+              <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 14, color: "#4B5563", fontWeight: 300 }}>
                 Test #{testId}
               </Typography>
             </Box>
@@ -145,14 +108,14 @@ const GraphScreen = () => {
               sx={{
                 height: 40,
                 px: 2.5,
-                border: "1px solid #E5E7EB",
+                border: "1px solid #E2E8F0",
                 color: "#374151",
                 borderRadius: 1.5,
                 fontFamily: '"DM Sans", sans-serif',
                 fontWeight: 400,
                 fontSize: 13,
                 textTransform: "none",
-                "&:hover": { bgcolor: "#F9FAFB" },
+                "&:hover": { bgcolor: "#F0F4F8" },
               }}
             >
               Actualizar
@@ -160,7 +123,7 @@ const GraphScreen = () => {
           </Box>
         </Box>
 
-        {/* Error */}
+        {/* Error state */}
         {error && (
           <Box
             sx={{
@@ -175,13 +138,7 @@ const GraphScreen = () => {
               gap: 2,
             }}
           >
-            <Typography
-              sx={{
-                fontFamily: '"DM Sans", sans-serif',
-                fontSize: 13,
-                color: "#B91C1C",
-              }}
-            >
+            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#B91C1C" }}>
               {error}
             </Typography>
             <Button
@@ -213,35 +170,15 @@ const GraphScreen = () => {
                 px: 2.5,
                 py: 1.5,
                 bgcolor: "#fff",
-                border: "1px solid #E5E7EB",
+                border: "1px solid #E2E8F0",
                 borderRadius: 2,
               }}
             >
-              <Box
-                sx={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: "50%",
-                  bgcolor: "#4ECBA0",
-                }}
-              />
-              <Typography
-                sx={{
-                  fontFamily: '"DM Sans", sans-serif',
-                  fontSize: 13,
-                  color: "#6B7280",
-                }}
-              >
+              <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: "#059669" }} />
+              <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#4B5563" }}>
                 Lecturas
               </Typography>
-              <Typography
-                sx={{
-                  fontFamily: '"DM Sans", sans-serif',
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: "#0D1117",
-                }}
-              >
+              <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 16, fontWeight: 700, color: "#111827" }}>
                 {data.length.toLocaleString()}
               </Typography>
             </Box>
@@ -256,9 +193,9 @@ const GraphScreen = () => {
                 data={data}
                 title="Acelerómetro"
                 dataKeys={[
-                  { key: "ax", axis: "left", color: "#1976d2" },
-                  { key: "ay", axis: "left", color: "#dc004e" },
-                  { key: "az", axis: "left", color: "#2e7d32" },
+                  { key: "ax", axis: "left", color: "#1B4F8A" },
+                  { key: "ay", axis: "left", color: "#DC2626" },
+                  { key: "az", axis: "left", color: "#059669" },
                 ]}
                 yAxisLabelLeft="Aceleración (m/s²)"
               />
@@ -268,9 +205,9 @@ const GraphScreen = () => {
                 data={data}
                 title="Giroscopio — Roll, Pitch y Yaw"
                 dataKeys={[
-                  { key: "p", axis: "left", color: "#ff9800" },
-                  { key: "r", axis: "left", color: "#9c27b0" },
-                  { key: "y", axis: "left", color: "#f44336" },
+                  { key: "p", axis: "left", color: "#D97706" },
+                  { key: "r", axis: "left", color: "#7C3AED" },
+                  { key: "y", axis: "left", color: "#DC2626" },
                 ]}
                 yAxisLabelLeft="Ángulo (°)"
               />
@@ -280,8 +217,8 @@ const GraphScreen = () => {
                 data={data}
                 title="Aceleración X y Roll"
                 dataKeys={[
-                  { key: "ax", axis: "left", color: "#1976d2" },
-                  { key: "r", axis: "right", color: "#9c27b0" },
+                  { key: "ax", axis: "left", color: "#1B4F8A" },
+                  { key: "r", axis: "right", color: "#7C3AED" },
                 ]}
                 yAxisLabelLeft="Aceleración (m/s²)"
                 yAxisLabelRight="Ángulo (°)"
@@ -292,8 +229,8 @@ const GraphScreen = () => {
                 data={data}
                 title="Aceleración Y y Pitch"
                 dataKeys={[
-                  { key: "ay", axis: "left", color: "#dc004e" },
-                  { key: "p", axis: "right", color: "#ff9800" },
+                  { key: "ay", axis: "left", color: "#DC2626" },
+                  { key: "p", axis: "right", color: "#D97706" },
                 ]}
                 yAxisLabelLeft="Aceleración (m/s²)"
                 yAxisLabelRight="Ángulo (°)"
@@ -304,8 +241,8 @@ const GraphScreen = () => {
                 data={data}
                 title="Aceleración Z y Yaw"
                 dataKeys={[
-                  { key: "az", axis: "left", color: "#2e7d32" },
-                  { key: "y", axis: "right", color: "#f44336" },
+                  { key: "az", axis: "left", color: "#059669" },
+                  { key: "y", axis: "right", color: "#DC2626" },
                 ]}
                 yAxisLabelLeft="Aceleración (m/s²)"
                 yAxisLabelRight="Ángulo (°)"
@@ -319,42 +256,26 @@ const GraphScreen = () => {
           <Box
             sx={{
               bgcolor: "#fff",
-              border: "1px solid #E5E7EB",
+              border: "1px solid #E2E8F0",
               borderRadius: 2.5,
               py: 10,
               textAlign: "center",
             }}
           >
-            <Typography
-              sx={{
-                fontFamily: '"DM Sans", sans-serif',
-                fontSize: 15,
-                fontWeight: 500,
-                color: "#374151",
-                mb: 1,
-              }}
-            >
+            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 15, fontWeight: 500, color: "#374151", mb: 1 }}>
               Sin datos disponibles
             </Typography>
-            <Typography
-              sx={{
-                fontFamily: '"DM Sans", sans-serif',
-                fontSize: 13,
-                color: "#9CA3AF",
-                fontWeight: 300,
-                mb: 4,
-              }}
-            >
+            <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#9CA3AF", fontWeight: 300, mb: 4 }}>
               Este test aún no tiene lecturas de sensores registradas
             </Typography>
             <Button
               onClick={loadGraphData}
               sx={{
                 ...backBtnStyle,
-                border: "1px solid #E5E7EB",
-                color: "#374151",
                 bgcolor: "transparent",
-                "&:hover": { bgcolor: "#F9FAFB" },
+                color: "#374151",
+                border: "1px solid #E2E8F0",
+                "&:hover": { bgcolor: "#F0F4F8" },
               }}
             >
               Verificar nuevamente
@@ -366,13 +287,11 @@ const GraphScreen = () => {
   );
 };
 
-/* ── helpers ── */
-
 const CenteredMessage = ({ children }) => (
   <Box
     sx={{
-      minHeight: "100vh",
-      bgcolor: "#F7F6F3",
+      minHeight: "calc(100vh - 64px)",
+      bgcolor: "#F0F4F8",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -389,25 +308,25 @@ const headingStyle = {
   fontFamily: '"DM Sans", sans-serif',
   fontSize: 22,
   fontWeight: 600,
-  color: "#0D1117",
+  color: "#111827",
 };
 const subStyle = {
   fontFamily: '"DM Sans", sans-serif',
   fontSize: 14,
-  color: "#6B7280",
+  color: "#4B5563",
   fontWeight: 300,
 };
 const backBtnStyle = {
   height: 42,
   px: 3,
-  bgcolor: "#0D1117",
+  bgcolor: "#1B4F8A",
   color: "#fff",
   borderRadius: 1.5,
   fontFamily: '"DM Sans", sans-serif',
   fontWeight: 500,
   fontSize: 13,
   textTransform: "none",
-  "&:hover": { bgcolor: "#1a2332" },
+  "&:hover": { bgcolor: "#153D6B" },
 };
 
 export default GraphScreen;
